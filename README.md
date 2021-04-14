@@ -1,8 +1,7 @@
-# :package_description
+# State pattern for any object in Laravel
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/dive-be/:package_name.svg?style=flat-square)](https://packagist.org/packages/dive-be/:package_name)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/dive-be/laravel-stateful.svg?style=flat-square)](https://packagist.org/packages/dive-be/laravel-stateful)
 
-**Note:** Run `./init.sh` to get started, or manually replace  ```:author_name``` ```:author_username``` ```:author_email``` ```:package_name``` ```:package_description``` with their correct values in [README.md](README.md), [CHANGELOG.md](CHANGELOG.md), [CONTRIBUTING.md](.github/CONTRIBUTING.md), [LICENSE.md](LICENSE.md) and [composer.json](composer.json) files, then delete this line. You can also run `init.sh` to do this automatically.
 
 This is where your description should go. Limit it to a paragraph or two. Consider adding a small example.
 
@@ -17,19 +16,19 @@ Optionally describe why someone would want to use this package.
 You can install the package via composer:
 
 ```bash
-composer require dive-be/:package_name
+composer require dive-be/laravel-stateful
 ```
 
 You can publish and run the migrations with:
 
 ```bash
-php artisan vendor:publish --provider="Dive\Skeleton\SkeletonServiceProvider" --tag="migrations"
+php artisan vendor:publish --provider="Dive\Stateful\StatefulServiceProvider" --tag="migrations"
 php artisan migrate
 ```
 
 You can publish the config file with:
 ```bash
-php artisan vendor:publish --provider="Dive\Skeleton\SkeletonServiceProvider" --tag="config"
+php artisan vendor:publish --provider="Dive\Stateful\StatefulServiceProvider" --tag="config"
 ```
 
 This is the contents of the published config file:
@@ -42,8 +41,8 @@ return [
 ## Usage
 
 ```php
-$skeleton = new Dive\Skeleton();
-echo $skeleton->echoPhrase('Hello, Dive!');
+$laravel-stateful = new Dive\Stateful();
+echo $laravel-stateful->echoPhrase('Hello, Dive!');
 ```
 
 ## Testing
@@ -66,7 +65,7 @@ If you discover any security related issues, please email oss@dive.be instead of
 
 ## Credits
 
-- [:author_name](https://github.com/:author_username)
+- [Muhammed Sari](https://github.com/mabdullahsari)
 - [All Contributors](../../contributors)
 
 ## License

@@ -1,24 +1,27 @@
 {
-    "name": "dive-be/:package_name",
-    "description": ":package_description",
+    "name": "dive-be/laravel-stateful",
+    "description": "State pattern for any object in Laravel",
     "keywords": [
         "dive",
-        ":package_name"
+        "laravel",
+        "state",
+        "pattern",
+        "transitions",
+        "guards",
+        "effects"
     ],
-    "homepage": "https://github.com/dive-be/:package_name",
+    "homepage": "https://github.com/dive-be/laravel-stateful",
     "license": "MIT",
     "authors": [
         {
-            "name": ":author_name",
-            "email": ":author_email",
+            "name": "Muhammed Sari",
+            "email": "muhammed@dive.be",
             "homepage": "https://dive.be",
             "role": "Developer"
         }
     ],
     "require": {
         "php": "^8.0",
-        "illuminate/console": "^8.0",
-        "illuminate/contracts": "^8.0",
         "illuminate/support": "^8.0"
     },
     "require-dev": {
@@ -30,12 +33,8 @@
         "phpunit/phpunit": "^9.5"
     },
     "autoload": {
-        "files": [
-            "src/helpers.php"
-        ],
         "psr-4": {
-            "Dive\\Skeleton\\": "src",
-            "Dive\\Skeleton\\Database\\Factories\\": "database/factories"
+            "Dive\\Stateful\\": "src"
         }
     },
     "autoload-dev": {
@@ -50,16 +49,6 @@
     },
     "config": {
         "sort-packages": true
-    },
-    "extra": {
-        "laravel": {
-            "providers": [
-                "Dive\\Skeleton\\SkeletonServiceProvider"
-            ],
-            "aliases": {
-                "Skeleton": "Dive\\Skeleton\\Facades\\Skeleton"
-            }
-        }
     },
     "minimum-stability": "dev",
     "prefer-stable": true
