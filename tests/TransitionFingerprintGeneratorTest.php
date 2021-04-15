@@ -2,7 +2,7 @@
 
 namespace Tests;
 
-use Dive\Stateful\Config\Repository;
+use Dive\Stateful\Config;
 use Dive\Stateful\Exceptions\FingerprintException;
 use Dive\Stateful\TransitionFingerprintGenerator;
 use Tests\Fakes\States\From;
@@ -28,6 +28,6 @@ it('throws if a fingerprint is being generated without a complete transition or 
     ['', ''],
     [From::class, ''],
     ['', To::class],
-    [Repository::class, To::class],
-    [From::class, Repository::class],
+    [Config::class, To::class],
+    [From::class, Config::class],
 ]);

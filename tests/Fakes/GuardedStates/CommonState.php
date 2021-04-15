@@ -2,13 +2,13 @@
 
 namespace Tests\Fakes\GuardedStates;
 
-use Dive\Stateful\Config\Repository;
-use Dive\Stateful\Config\Transition;
+use Dive\Stateful\Config;
 use Dive\Stateful\State;
+use Dive\Stateful\Transition;
 
 abstract class CommonState extends State
 {
-    public static function config(): Repository
+    public static function config(): Config
     {
         return parent::config()
             ->allowTransition(Transition::make(FromA::class, ToA::class)->guard(fn () => false))

@@ -2,23 +2,22 @@
 
 namespace Dive\Stateful;
 
-use Dive\Stateful\Config\Repository;
 use Dive\Stateful\Contracts\Stateful;
 use Dive\Stateful\Exceptions\TransitionFailedException;
 use Illuminate\Support\Str;
 
 abstract class State
 {
-    protected Repository $config;
+    protected Config $config;
 
     final public function __construct(protected Stateful $object)
     {
         $this->config = static::config();
     }
 
-    public static function config(): Repository
+    public static function config(): Config
     {
-        return Repository::make();
+        return Config::make();
     }
 
     public static function make(Stateful $object): static

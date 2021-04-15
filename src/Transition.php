@@ -1,6 +1,6 @@
 <?php
 
-namespace Dive\Stateful\Config;
+namespace Dive\Stateful;
 
 use Illuminate\Contracts\Support\Arrayable;
 
