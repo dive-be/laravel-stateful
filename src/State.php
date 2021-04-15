@@ -11,7 +11,7 @@ abstract class State
 {
     protected Repository $config;
 
-    public function __construct(protected Stateful $object)
+    final public function __construct(protected Stateful $object)
     {
         $this->config = static::config();
     }
