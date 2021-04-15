@@ -22,11 +22,19 @@ class Repository
         return new self();
     }
 
-    public function allowTransition(string $from, string $to, callable|string|null $guard = null): self
+    public function allowTransition(Transition|string $from, ?string $to = null): self
     {
+        $transition = ['after' => null, 'before' => null, 'guard' => null];
+
+        if ($from instanceof Transition) {
+            $transition = $from->toArray();
+            $from = Arr::pull($transition, 'from');
+            $to = Arr::pull($transition, 'to');
+        }
+
         $fingerprint = $this->generator->from($from)->to($to)->generate();
 
-        Arr::set($this->transitions, $fingerprint, $guard);
+        Arr::set($this->transitions, $fingerprint, $transition);
 
         return $this;
     }
@@ -39,7 +47,7 @@ class Repository
 
         $fingerprint = $this->generator->from($from)->to($to)->generate();
 
-        $guard = Arr::get($this->transitions, $fingerprint);
+        $guard = Arr::get($this->transitions, "{$fingerprint}.guard");
 
         if (is_string($guard) && class_exists($guard)) {
             $guard = app($guard);
@@ -57,7 +65,7 @@ class Repository
     {
         $fingerprint = $this->generator->from($from)->to($to)->generate();
 
-        return ! is_null(Arr::get($this->transitions, $fingerprint));
+        return ! is_null(Arr::get($this->transitions, "{$fingerprint}.guard"));
     }
 
     public function isTransitionAllowed(string $from, string $to): bool
