@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Fakes;
+namespace Tests\Fakes\States;
 
 class To extends CommonState
 {

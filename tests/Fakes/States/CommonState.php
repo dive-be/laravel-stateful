@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Fakes;
+namespace Tests\Fakes\States;
 
 use Dive\Stateful\Config;
 use Dive\Stateful\State;

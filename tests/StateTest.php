@@ -4,11 +4,11 @@ namespace Tests;
 
 use Dive\Stateful\Config;
 use Dive\Stateful\Exceptions\TransitionFailedException;
-use Tests\Fakes\Another;
-use Tests\Fakes\ExampleStateDeliberatelyMadeWithALongName;
-use Tests\Fakes\From;
-use Tests\Fakes\StatefulObject;
-use Tests\Fakes\To;
+use Tests\Fakes\States\Another;
+use Tests\Fakes\States\ExampleStateDeliberatelyMadeWithALongName;
+use Tests\Fakes\States\From;
+use Tests\Fakes\States\StatefulObject;
+use Tests\Fakes\States\To;
 
 it("can return the state's name in lower snake case", function () {
     expect(ExampleStateDeliberatelyMadeWithALongName::name())->toBe('example_state_deliberately_made_with_a_long_name');

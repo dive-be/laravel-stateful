@@ -5,8 +5,8 @@ namespace Tests;
 use Dive\Stateful\Config;
 use Dive\Stateful\Exceptions\FingerprintException;
 use Dive\Stateful\TransitionFingerprintGenerator;
-use Tests\Fakes\From;
-use Tests\Fakes\To;
+use Tests\Fakes\States\From;
+use Tests\Fakes\States\To;
 
 beforeEach(function () {
     $this->fingerprint = TransitionFingerprintGenerator::make();

@@ -4,8 +4,8 @@ namespace Tests;
 
 use Dive\Stateful\Transition;
 use Mockery;
-use Tests\Fakes\StatefulObject;
-use Tests\Fakes\To;
+use Tests\Fakes\States\StatefulObject;
+use Tests\Fakes\States\To;
 
 it("sets the object's new state", function () {
     $object = Mockery::mock(StatefulObject::class);
