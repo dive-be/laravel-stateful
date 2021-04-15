@@ -2,7 +2,6 @@
 
 namespace Tests;
 
-use Dive\Stateful\Config;
 use Dive\Stateful\Exceptions\TransitionFailedException;
 use Tests\Fakes\GuardedStates\StatefulObjectA;
 use Tests\Fakes\GuardedStates\StatefulObjectB;

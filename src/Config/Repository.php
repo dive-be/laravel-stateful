@@ -1,11 +1,12 @@
 <?php
 
-namespace Dive\Stateful;
+namespace Dive\Stateful\Config;
 
 use Dive\Stateful\Exceptions\InvalidConfigurationException;
+use Dive\Stateful\TransitionFingerprintGenerator;
 use Illuminate\Support\Arr;
 
-class Config
+class Repository
 {
     private TransitionFingerprintGenerator $generator;
 
