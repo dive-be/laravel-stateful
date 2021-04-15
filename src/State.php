@@ -54,6 +54,16 @@ abstract class State
             }
         }
 
-        return $this->object->setState(new $to($this->object));
+        if ($before = $this->config->getBeforeCallback($from, $to)) {
+            $before($to, $this->object);
+        }
+
+        $object = $this->object->setState(new $to($this->object));
+
+        if ($after = $this->config->getAfterCallback($from, $to)) {
+            $after($from, $this->object);
+        }
+
+        return $object;
     }
 }

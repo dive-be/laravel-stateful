@@ -39,21 +39,23 @@ class Repository
         return $this;
     }
 
+    public function getAfterCallback(string $from, string $to): ?callable
+    {
+        return $this->resolve($this->getProperty($from, $to, 'after'));
+    }
+
+    public function getBeforeCallback(string $from, string $to): ?callable
+    {
+        return $this->resolve($this->getProperty($from, $to, 'before'));
+    }
+
     public function getGuard(string $from, string $to): callable
     {
         if (! $this->isGuarded($from, $to)) {
             throw InvalidConfigurationException::unguarded($from, $to);
         }
 
-        $fingerprint = $this->generator->from($from)->to($to)->generate();
-
-        $guard = Arr::get($this->transitions, "{$fingerprint}.guard");
-
-        if (is_string($guard) && class_exists($guard)) {
-            $guard = app($guard);
-        }
-
-        return $guard;
+        return $this->resolve($this->getProperty($from, $to, 'guard'));
     }
 
     public function getTransitions(): array
@@ -63,15 +65,23 @@ class Repository
 
     public function isGuarded(string $from, string $to): bool
     {
-        $fingerprint = $this->generator->from($from)->to($to)->generate();
-
-        return ! is_null(Arr::get($this->transitions, "{$fingerprint}.guard"));
+        return ! is_null($this->getProperty($from, $to, 'guard'));
     }
 
     public function isTransitionAllowed(string $from, string $to): bool
     {
+        return is_array($this->getProperty($from, $to));
+    }
+
+    private function getProperty(string $from, string $to, ?string $property = null)
+    {
         $fingerprint = $this->generator->from($from)->to($to)->generate();
 
-        return array_key_exists($fingerprint, $this->transitions);
+        return Arr::get($this->transitions, $fingerprint.(is_string($property) ? '.'.$property : ''));
+    }
+
+    private function resolve($value)
+    {
+        return is_string($value) && class_exists($value) ? app($value) : $value;
     }
 }
