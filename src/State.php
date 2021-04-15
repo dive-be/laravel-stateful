@@ -53,6 +53,6 @@ abstract class State
             }
         }
 
-        return (new Transition($to, $this->object))->handle();
+        return $this->object->setState(new $to($this->object));
     }
 }
