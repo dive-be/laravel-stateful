@@ -41,7 +41,7 @@ abstract class State
             return $this->object;
         }
 
-        if (! $this->config->isTransitionAllowed($from, $to)) {
+        if (! $this->canTransitionTo($to)) {
             throw TransitionFailedException::disallowed($from, $to);
         }
 
