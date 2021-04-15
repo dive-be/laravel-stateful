@@ -25,7 +25,7 @@ class Transition
         return new self($from, $to);
     }
 
-    public function getAfter(): callable|string|null
+    public function getAfter(): callable|null
     {
         return $this->resolveCallable($this->after);
     }
