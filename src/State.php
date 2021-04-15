@@ -37,7 +37,11 @@ abstract class State
 
     public function transitionTo(string $to): Stateful
     {
-        if (! $this->config->isTransitionAllowed($from = static::class, $to)) {
+        if (($from = static::class) === $to) {
+            return $this->object;
+        }
+
+        if (! $this->config->isTransitionAllowed($from, $to)) {
             throw TransitionFailedException::disallowed($from, $to);
         }
 
