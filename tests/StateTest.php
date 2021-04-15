@@ -18,11 +18,6 @@ it("can return the state's name in lower snake case", function () {
     expect(ExampleStateDeliberatelyMadeWithALongName::name())->toBe('example_state_deliberately_made_with_a_long_name');
 });
 
-it('can return a default, empty transition configuration', function () {
-    expect($config = ExampleStateDeliberatelyMadeWithALongName::config())->toBeInstanceOf(Config::class);
-    expect($config->getTransitions())->toBeEmpty();
-});
-
 it('can determine whether a transition is allowed to take place', function () {
     $state = new From(new StatefulObject());
 

@@ -56,7 +56,7 @@ class Config
     {
         $fingerprint = $this->generator->from($from)->to($to)->generate();
 
-        return Arr::has($this->transitions, $fingerprint);
+        return ! is_null(Arr::get($this->transitions, $fingerprint));
     }
 
     public function isTransitionAllowed(string $from, string $to): bool
