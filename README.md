@@ -2,14 +2,16 @@
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/dive-be/laravel-stateful.svg?style=flat-square)](https://packagist.org/packages/dive-be/laravel-stateful)
 
-
-This is where your description should go. Limit it to a paragraph or two. Consider adding a small example.
+This package adds state support to non-Eloquent objects in Laravel.
 
 ⚠️ Minor releases of this package may cause breaking changes as it has no stable release yet.
 
 ## What problem does this package solve?
 
-Optionally describe why someone would want to use this package.
+Usually, when defining "states" or "statuses" on objects, enumeration-like values/objects are used to represent the 
+current state of the object. While this approach is pragmatic and good enough for simple use cases, it tends to become a
+mess rapidly when complex domain logic has to be incorporated. This package solves this problem by using the state pattern
+and the concept of state machines.
 
 ## Installation
 
@@ -19,30 +21,56 @@ You can install the package via composer:
 composer require dive-be/laravel-stateful
 ```
 
-You can publish and run the migrations with:
-
-```bash
-php artisan vendor:publish --provider="Dive\Stateful\StatefulServiceProvider" --tag="migrations"
-php artisan migrate
-```
-
-You can publish the config file with:
-```bash
-php artisan vendor:publish --provider="Dive\Stateful\StatefulServiceProvider" --tag="config"
-```
-
-This is the contents of the published config file:
-
-```php
-return [
-];
-```
-
 ## Usage
 
+The best example is a practical example.
+
+### Context
+
+Let's say there is a `CheckoutWizard` class that has many possible states: `AddressSelect`, `ShippingSelect`, `Summary`, `Complete`.
+Each of these states should map to the current index of the Wizard in the front-end and each step also has a distinct
+color to give visual feedback to the user.
+
+### Abstract state
+
+That's why first, we should create an abstract `CheckoutState` class and define all possible transitions. For example,
+it makes absolutely zero sense to go back to an `AddressSelect` state if the `CheckoutWizard` has reached the `Complete` state.
+However, it is perfectly fine for the user to go back to a previous step as long as the `Complete` state is not reached.
+
 ```php
-$laravel-stateful = new Dive\Stateful();
-echo $laravel-stateful->echoPhrase('Hello, Dive!');
+abstract class CheckoutState extends State
+{
+    abstract public function color(): string;
+
+    abstract public function step(): int;
+    
+    public static function config(): Config
+    {
+        return parent::config()
+            ->allowTransition(AddressSelect::class, ShippingSelect::class)
+            ->allowTransition(ShippingSelect::class, AddressSelect::class) // go back
+            ->allowTransition(ShippingSelect::class, Summary::class)
+            ->allowTransition(Summary::class, ShippingSelect::class) // go back
+            ->allowTransition(Summary::class, Complete::class);
+    }
+}
+```
+
+Here is what the `AddressSelect` state could look like:
+
+```php
+class AddressSelect extends CheckoutState
+{
+    public function color(): string
+    {
+        return 'maroon';
+    }
+    
+    public function step(): int
+    {
+        return 0;
+    }
+}
 ```
 
 ## Testing
@@ -67,6 +95,7 @@ If you discover any security related issues, please email oss@dive.be instead of
 
 - [Muhammed Sari](https://github.com/mabdullahsari)
 - [All Contributors](../../contributors)
+- Spatie for their superb [Model States](https://github.com/spatie/laravel-model-states) package that has heavily inspired this package
 
 ## License
 
