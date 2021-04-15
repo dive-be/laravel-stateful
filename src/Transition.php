@@ -2,9 +2,9 @@
 
 namespace Dive\Stateful;
 
-use Illuminate\Contracts\Support\Arrayable;
+use Dive\Stateful\Exceptions\InvalidStateArgumentException;
 
-class Transition implements Arrayable
+class Transition
 {
     private $after = null;
 
@@ -13,13 +13,41 @@ class Transition implements Arrayable
     private $guard = null;
 
     private function __construct(
-        private ?string $from = null,
-        private ?string $to = null,
-    ) {}
+        private string $from,
+        private string $to,
+    ) {
+        $this->verifyState($from);
+        $this->verifyState($to);
+    }
 
-    public static function make(?string $from = null, ?string $to = null)
+    public static function make(string $from, string $to)
     {
         return new self($from, $to);
+    }
+
+    public function getAfter(): callable|string|null
+    {
+        return $this->resolveCallable($this->after);
+    }
+
+    public function getBefore(): callable|null
+    {
+        return $this->resolveCallable($this->before);
+    }
+
+    public function getFrom(): string
+    {
+        return $this->from;
+    }
+
+    public function getGuard(): callable|null
+    {
+        return $this->resolveCallable($this->guard);
+    }
+
+    public function getTo(): string
+    {
+        return $this->to;
     }
 
     public function after(callable|string $callback): self
@@ -36,13 +64,6 @@ class Transition implements Arrayable
         return $this;
     }
 
-    public function from(string $from): self
-    {
-        $this->from = $from;
-
-        return $this;
-    }
-
     public function guard(callable|string $callback): self
     {
         $this->guard = $callback;
@@ -50,21 +71,28 @@ class Transition implements Arrayable
         return $this;
     }
 
-    public function to(string $to): self
+    public function isGuarded()
     {
-        $this->to = $to;
-
-        return $this;
+        return ! is_null($this->guard);
     }
 
-    public function toArray(): array
+    private function resolveCallable(callable|string|null $callback): callable|null
     {
-        return [
-            'after' => $this->after,
-            'before' => $this->before,
-            'from' => $this->from,
-            'guard' => $this->guard,
-            'to' => $this->to,
-        ];
+        if (is_string($callback) && class_exists($callback)) {
+            return app($callback);
+        }
+
+        return $callback;
+    }
+
+    private function verifyState(string $state)
+    {
+        if (! class_exists($state)) {
+            throw InvalidStateArgumentException::doesNotExist($state);
+        }
+
+        if (! is_subclass_of($state, $class = State::class)) {
+            throw InvalidStateArgumentException::doesNotExtendState($state, $class);
+        }
     }
 }

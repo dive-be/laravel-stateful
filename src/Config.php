@@ -2,18 +2,17 @@
 
 namespace Dive\Stateful;
 
-use Dive\Stateful\Exceptions\InvalidConfigurationException;
 use Illuminate\Support\Arr;
 
 class Config
 {
-    private TransitionFingerprintGenerator $generator;
+    private TransitionKeyGenerator $key;
 
     private array $transitions = [];
 
     public function __construct()
     {
-        $this->generator = TransitionFingerprintGenerator::make();
+        $this->key = TransitionKeyGenerator::make();
     }
 
     public static function make(): self
@@ -23,38 +22,18 @@ class Config
 
     public function allowTransition(Transition|string $from, ?string $to = null): self
     {
-        $transition = ['after' => null, 'before' => null, 'guard' => null];
-
-        if ($from instanceof Transition) {
-            $transition = $from->toArray();
-            $from = Arr::pull($transition, 'from');
-            $to = Arr::pull($transition, 'to');
+        if (is_string($from)) {
+            $from = Transition::make($from, $to);
         }
 
-        $fingerprint = $this->generator->from($from)->to($to)->generate();
-
-        Arr::set($this->transitions, $fingerprint, $transition);
+        Arr::set($this->transitions, $this->key->generate($from->getFrom(), $from->getTo()), $from);
 
         return $this;
     }
 
-    public function getAfterCallback(string $from, string $to): ?callable
+    public function getTransition(string $from, string $to): ?Transition
     {
-        return $this->resolve($this->getProperty($from, $to, 'after'));
-    }
-
-    public function getBeforeCallback(string $from, string $to): ?callable
-    {
-        return $this->resolve($this->getProperty($from, $to, 'before'));
-    }
-
-    public function getGuard(string $from, string $to): callable
-    {
-        if (! $this->isGuarded($from, $to)) {
-            throw InvalidConfigurationException::unguarded($from, $to);
-        }
-
-        return $this->resolve($this->getProperty($from, $to, 'guard'));
+        return Arr::get($this->transitions, $this->key->generate($from, $to));
     }
 
     public function getTransitions(): array
@@ -62,25 +41,8 @@ class Config
         return $this->transitions;
     }
 
-    public function isGuarded(string $from, string $to): bool
-    {
-        return ! is_null($this->getProperty($from, $to, 'guard'));
-    }
-
     public function isTransitionAllowed(string $from, string $to): bool
     {
-        return is_array($this->getProperty($from, $to));
-    }
-
-    private function getProperty(string $from, string $to, ?string $property = null)
-    {
-        $fingerprint = $this->generator->from($from)->to($to)->generate();
-
-        return Arr::get($this->transitions, $fingerprint.(is_string($property) ? '.'.$property : ''));
-    }
-
-    private function resolve($value)
-    {
-        return is_string($value) && class_exists($value) ? app($value) : $value;
+        return array_key_exists($this->key->generate($from, $to), $this->transitions);
     }
 }

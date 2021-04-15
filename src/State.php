@@ -45,21 +45,19 @@ abstract class State
             throw TransitionFailedException::disallowed($from, $to);
         }
 
-        if ($this->config->isGuarded($from, $to)) {
-            $guard = $this->config->getGuard($from, $to);
+        $transition = $this->config->getTransition($from, $to);
 
-            if (! $guard($this->object)) {
-                throw TransitionFailedException::guarded($from, $to);
-            }
+        if ($transition->isGuarded() && ! call_user_func($transition->getGuard(), $this->object)) {
+            throw TransitionFailedException::guarded($from, $to);
         }
 
-        if ($before = $this->config->getBeforeCallback($from, $to)) {
+        if ($before = $transition->getBefore()) {
             $before($to, $this->object);
         }
 
         $object = $this->object->setState(new $to($this->object));
 
-        if ($after = $this->config->getAfterCallback($from, $to)) {
+        if ($after = $transition->getAfter()) {
             $after($from, $this->object);
         }
 
