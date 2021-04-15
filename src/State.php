@@ -35,12 +35,20 @@ abstract class State
         return $this->config->isTransitionAllowed(static::class, $state);
     }
 
-    public function transitionTo(string $state): Stateful
+    public function transitionTo(string $to): Stateful
     {
-        if (! $this->canTransitionTo($state)) {
-            throw TransitionFailedException::make(static::class, $state);
+        if (! $this->config->isTransitionAllowed($from = static::class, $to)) {
+            throw TransitionFailedException::disallowed($from, $to);
         }
 
-        return (new Transition($state, $this->object))->handle();
+        if ($this->config->isGuarded($from, $to)) {
+            $guard = $this->config->getGuard($from, $to);
+
+            if (! $guard($this->object)) {
+                throw TransitionFailedException::guarded($from, $to);
+            }
+        }
+
+        return (new Transition($to, $this->object))->handle();
     }
 }

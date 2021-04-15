@@ -38,7 +38,13 @@ class Config
 
         $fingerprint = $this->generator->from($from)->to($to)->generate();
 
-        return Arr::get($this->transitions, $fingerprint);
+        $guard = Arr::get($this->transitions, $fingerprint);
+
+        if (is_string($guard) && class_exists($guard)) {
+            $guard = app($guard);
+        }
+
+        return $guard;
     }
 
     public function getTransitions(): array
@@ -50,7 +56,7 @@ class Config
     {
         $fingerprint = $this->generator->from($from)->to($to)->generate();
 
-        return is_callable(Arr::get($this->transitions, $fingerprint));
+        return Arr::has($this->transitions, $fingerprint);
     }
 
     public function isTransitionAllowed(string $from, string $to): bool
