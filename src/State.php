@@ -4,38 +4,35 @@ namespace Dive\Stateful;
 
 use Dive\Stateful\Contracts\Stateful;
 use Dive\Stateful\Exceptions\TransitionFailedException;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 abstract class State
 {
-    protected array $transitions = [];
+    protected Config $config;
 
-    public function __construct(protected Stateful $object) {}
+    public function __construct(protected Stateful $object)
+    {
+        $this->config = static::config();
+    }
+
+    public static function config(): Config
+    {
+        return Config::make();
+    }
 
     public static function make(Stateful $object): static
     {
         return new static($object);
     }
 
-    public function canTransitionTo(string $state): bool
+    public static function name(): string
     {
-        $transitions = Arr::get($this->transitions, static::class);
-
-        if (is_null($transitions)) {
-            return false;
-        }
-
-        if (is_string($transitions)) {
-            return $transitions === $state;
-        }
-
-        return in_array($state, $transitions);
+        return Str::lower(Str::snake(class_basename(static::class)));
     }
 
-    public function name(): string
+    public function canTransitionTo(string $state): bool
     {
-        return Str::lower(class_basename(static::class));
+        return $this->config->isTransitionAllowed(static::class, $state);
     }
 
     public function transitionTo(string $state): Stateful
