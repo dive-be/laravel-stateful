@@ -21,7 +21,7 @@ class Config
         return new self();
     }
 
-    public function allowTransition(string $from, string $to, ?callable $guard = null): self
+    public function allowTransition(string $from, string $to, callable|string|null $guard = null): self
     {
         $fingerprint = $this->generator->from($from)->to($to)->generate();
 

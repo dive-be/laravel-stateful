@@ -4,6 +4,10 @@ namespace Tests;
 
 use Dive\Stateful\Config;
 use Dive\Stateful\Exceptions\TransitionFailedException;
+use Tests\Fakes\GuardedStates\StatefulObjectA;
+use Tests\Fakes\GuardedStates\StatefulObjectB;
+use Tests\Fakes\GuardedStates\ToA;
+use Tests\Fakes\GuardedStates\ToB;
 use Tests\Fakes\States\Another;
 use Tests\Fakes\States\ExampleStateDeliberatelyMadeWithALongName;
 use Tests\Fakes\States\From;
@@ -40,4 +44,16 @@ it('throws if an illegal transition is attempted', function () {
     $object = new StatefulObject();
 
     $object->getState()->transitionTo(Another::class);
+})->throws(TransitionFailedException::class);
+
+it('throws if a guard disallows a valid transition', function () {
+    $object = new StatefulObjectB();
+
+    $object->getState()->transitionTo(ToB::class);
+})->throws(TransitionFailedException::class);
+
+it('does also accept a simple closure as the guard', function () {
+    $object = new StatefulObjectA();
+
+    $object->getState()->transitionTo(ToA::class);
 })->throws(TransitionFailedException::class);
