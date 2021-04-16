@@ -73,6 +73,80 @@ class AddressSelect extends CheckoutState
 }
 ```
 
+### The stateful class
+
+Your stateful classes should implement the `Stateful` contract and use the `InteractsWithState` trait.
+(The latter is optional, but recommended. Adhering to the contract is sufficient.)
+
+```php
+use Dive\Stateful\Contracts\Stateful;
+use Dive\Stateful\InteractsWithState;
+
+class CheckoutWizard implements Stateful
+{
+    use InteractsWithState;
+    
+    // your code
+}
+````
+
+### Transitioning
+
+Now, to transition to another state:
+
+```php
+$checkout = new CheckoutWizard();
+
+$checkout->getState()->transitionTo(Complete::class);
+```
+
+Unless the transition is allowed, a `TransitionFailedException` will be thrown preventing impossible state transitions.
+
+### Guards
+
+Sometimes, even when a specific transition is allowed, certain conditions may have to be met in order to transition.
+In this case, guards may be used to achieve this behavior. However, the registration of allowed transitions slightly 
+differs. You must use the `Transition` class directly and guard can be any `callable` (Invokable class, Closure, public class methods).
+When an invokable class is defined as the guard for a transition, it will be instantiated from the IoC container.
+
+```php
+class ExampleGuard
+{
+    public function __construct(private MyService $service) {}
+    
+    public function __invoke(CheckoutWizard $checkout): bool
+    {
+        return $this->service->isValid($checkout);
+    }
+}
+```
+
+```php
+abstract class CheckoutState extends State
+{
+    // omitted for brevity
+    
+    public static function config(): Config
+    {
+        return parent::config()
+            ->allowTransition(Transition::make(AddressSelect::class, ShippingSelect::class)->guard(ExampleGuard::class));
+    }
+}
+```
+
+Now, every time a transition is attempted, the guard will be consulted first.
+
+### Side effects / hooks
+
+You can use the `after` or `before` setters on the `Transition` class to define callbacks that should be executed
+before or after a certain transition has taken place.
+
+```php
+Transition::make(AddressSelect::class, ShippingSelect::class)
+    ->guard(ExampleGuard::class)
+    ->after(fn ($to, $checkout) => event(new MyEvent($checkout)));
+```
+
 ## Testing
 
 ```bash
