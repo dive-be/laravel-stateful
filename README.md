@@ -2,7 +2,12 @@
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/dive-be/laravel-stateful.svg?style=flat-square)](https://packagist.org/packages/dive-be/laravel-stateful)
 
-This package adds state support to non-Eloquent objects in Laravel.
+This package adds state support to non-Eloquent objects in Laravel. 
+
+If you need support for Eloquent models, there are excellent alternatives:
+
+- [Eloquent State Machines](https://github.com/asantibanez/laravel-eloquent-state-machines)
+- [Model States](https://github.com/spatie/laravel-model-states)
 
 ⚠️ Minor releases of this package may cause breaking changes as it has no stable release yet.
 
