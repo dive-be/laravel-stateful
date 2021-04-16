@@ -2,31 +2,27 @@
 
 namespace Dive\Stateful;
 
+use Dive\Stateful\Support\Makeable;
 use Illuminate\Support\Arr;
 
-class Config
+final class Config
 {
+    use Makeable;
+
     private TransitionKeyGenerator $key;
 
     private array $transitions = [];
 
     public function __construct()
     {
-        $this->key = TransitionKeyGenerator::make();
+        $this->key = new TransitionKeyGenerator();
     }
 
-    public static function make(): self
+    public function allowTransition(string $from, ?string $to = null): self
     {
-        return new self();
-    }
+        $transition = is_string($to) ? DefaultTransition::make($from, $to) : call_user_func([$from, 'make']);
 
-    public function allowTransition(Transition|string $from, ?string $to = null): self
-    {
-        if (is_string($from)) {
-            $from = Transition::make($from, $to);
-        }
-
-        Arr::set($this->transitions, $this->key->generate($from->getFrom(), $from->getTo()), $from);
+        Arr::set($this->transitions, $this->key->generate($transition->from(), $transition->to()), $transition);
 
         return $this;
     }

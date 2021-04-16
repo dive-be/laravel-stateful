@@ -4,10 +4,13 @@ namespace Dive\Stateful;
 
 use Dive\Stateful\Contracts\Stateful;
 use Dive\Stateful\Exceptions\TransitionFailedException;
+use Dive\Stateful\Support\Makeable;
 use Illuminate\Support\Str;
 
 abstract class State
 {
+    use Makeable;
+
     protected Config $config;
 
     final public function __construct(protected Stateful $object)
@@ -18,11 +21,6 @@ abstract class State
     public static function config(): Config
     {
         return Config::make();
-    }
-
-    public static function make(Stateful $object): static
-    {
-        return new static($object);
     }
 
     public static function name(): string
@@ -47,19 +45,15 @@ abstract class State
 
         $transition = $this->config->getTransition($from, $to);
 
-        if ($transition->isGuarded() && ! call_user_func($transition->getGuard(), $this->object)) {
+        $transition->whenGuarded($this->object, function () use ($from, $to) {
             throw TransitionFailedException::guarded($from, $to);
-        }
+        });
 
-        if ($before = $transition->getBefore()) {
-            $before($to, $this->object);
-        }
+        $transition->runBeforeHook($this->object, $to);
 
         $object = $this->object->setState(new $to($this->object));
 
-        if ($after = $transition->getAfter()) {
-            $after($from, $this->object);
-        }
+        $transition->runAfterHook($this->object, $from);
 
         return $object;
     }

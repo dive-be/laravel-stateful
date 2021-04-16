@@ -8,3 +8,7 @@ parameters:
     level: 5
 
     checkMissingIterableValueType: false
+
+    ignoreErrors:
+        - '#Unsafe usage of new static\(\)\.#'
+        - '#Class Dive\\Stateful\\TransitionKeyGenerator does not have a constructor and must be instantiated without any parameters\.#'

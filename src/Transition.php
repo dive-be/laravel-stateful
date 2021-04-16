@@ -2,97 +2,42 @@
 
 namespace Dive\Stateful;
 
-use Dive\Stateful\Exceptions\InvalidStateArgumentException;
+use Closure;
+use Dive\Stateful\Contracts\Stateful;
+use Dive\Stateful\Support\Makeable;
 
-class Transition
+abstract class Transition
 {
-    private $after = null;
+    use Makeable;
 
-    private $before = null;
+    abstract public function from(): string;
 
-    private $guard = null;
+    abstract public function to(): string;
 
-    private function __construct(
-        private string $from,
-        private string $to,
-    ) {
-        $this->verifyState($from);
-        $this->verifyState($to);
+    public function runAfterHook(Stateful $object, string $state): void
+    {
+        if (method_exists($this, 'after')) {
+            $this->after($state, $object);
+        }
     }
 
-    public static function make(string $from, string $to)
+    public function runBeforeHook(Stateful $object, string $state): void
     {
-        return new self($from, $to);
+        if (method_exists($this, 'before')) {
+            $this->before($state, $object);
+        }
     }
 
-    public function getAfter(): callable|null
+    public function whenGuarded(Stateful $object, Closure $callback): void
     {
-        return $this->resolveCallable($this->after);
-    }
-
-    public function getBefore(): callable|null
-    {
-        return $this->resolveCallable($this->before);
-    }
-
-    public function getFrom(): string
-    {
-        return $this->from;
-    }
-
-    public function getGuard(): callable|null
-    {
-        return $this->resolveCallable($this->guard);
-    }
-
-    public function getTo(): string
-    {
-        return $this->to;
-    }
-
-    public function after(callable|string $callback): self
-    {
-        $this->after = $callback;
-
-        return $this;
-    }
-
-    public function before(callable|string $callback): self
-    {
-        $this->before = $callback;
-
-        return $this;
-    }
-
-    public function guard(callable|string $callback): self
-    {
-        $this->guard = $callback;
-
-        return $this;
-    }
-
-    public function isGuarded()
-    {
-        return ! is_null($this->guard);
-    }
-
-    private function resolveCallable(callable|string|null $callback): callable|null
-    {
-        if (is_string($callback) && class_exists($callback)) {
-            return app($callback);
+        if (! method_exists($this, 'guard')) {
+            return;
         }
 
-        return $callback;
-    }
-
-    private function verifyState(string $state)
-    {
-        if (! class_exists($state)) {
-            throw InvalidStateArgumentException::doesNotExist($state);
+        if ($this->guard($object)) {
+            return;
         }
 
-        if (! is_subclass_of($state, $class = State::class)) {
-            throw InvalidStateArgumentException::doesNotExtendState($state, $class);
-        }
+        $callback();
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Fakes\GuardedStates;
+namespace Tests\Fakes\States;
 
 use Dive\Stateful\Contracts\Stateful;
 use Dive\Stateful\InteractsWithState;

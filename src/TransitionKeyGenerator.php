@@ -2,14 +2,13 @@
 
 namespace Dive\Stateful;
 
-class TransitionKeyGenerator
-{
-    public const SEPARATOR = '=>';
+use Dive\Stateful\Support\Makeable;
 
-    public static function make(): self
-    {
-        return new self();
-    }
+final class TransitionKeyGenerator
+{
+    use Makeable;
+
+    public const SEPARATOR = '=>';
 
     public function generate(string $from, string $to): string
     {

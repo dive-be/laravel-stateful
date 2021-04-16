@@ -2,6 +2,6 @@
 
 namespace Tests\Fakes\States;
 
-class To extends CommonState
+class ToA extends CommonState
 {
 }

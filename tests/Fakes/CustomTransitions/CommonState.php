@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Fakes\States;
+namespace Tests\Fakes\CustomTransitions;
 
 use Dive\Stateful\Config;
 use Dive\Stateful\State;
@@ -9,6 +9,6 @@ abstract class CommonState extends State
 {
     public static function config(): Config
     {
-        return parent::config()->allowTransition(FromA::class, ToA::class);
+        return parent::config()->allowTransition(CustomTransition::class);
     }
 }

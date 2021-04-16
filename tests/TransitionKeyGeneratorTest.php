@@ -3,11 +3,11 @@
 namespace Tests;
 
 use Dive\Stateful\TransitionKeyGenerator;
-use Tests\Fakes\States\From;
-use Tests\Fakes\States\To;
+use Tests\Fakes\States\FromA;
+use Tests\Fakes\States\ToA;
 
 it("can generate a transition's key", function () {
-    $key = TransitionKeyGenerator::make()->generate(From::class, To::class);
+    $key = TransitionKeyGenerator::make()->generate(FromA::class, ToA::class);
 
-    expect($key)->toBe('from=>to');
+    expect($key)->toBe('fromA=>toA');
 });

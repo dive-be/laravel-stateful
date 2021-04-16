@@ -1,16 +1,16 @@
 <?php
 
-namespace Tests\Fakes\States;
+namespace Tests\Fakes\CustomTransitions;
 
 use Dive\Stateful\Contracts\Stateful;
 use Dive\Stateful\InteractsWithState;
 
-class StatefulObject implements Stateful
+class StatefulObjectB implements Stateful
 {
     use InteractsWithState;
 
     public function __construct()
     {
-        $this->state = From::make($this);
+        $this->state = FromB::make($this);
     }
 }

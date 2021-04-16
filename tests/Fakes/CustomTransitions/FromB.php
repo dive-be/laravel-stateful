@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Fakes\GuardedStates;
+namespace Tests\Fakes\CustomTransitions;
 
 class FromB extends CommonState
 {

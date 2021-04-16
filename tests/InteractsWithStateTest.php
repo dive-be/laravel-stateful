@@ -2,16 +2,16 @@
 
 namespace Tests;
 
-use Tests\Fakes\States\From;
-use Tests\Fakes\States\StatefulObject;
-use Tests\Fakes\States\To;
+use Tests\Fakes\States\FromA;
+use Tests\Fakes\States\StatefulObjectA;
+use Tests\Fakes\States\ToA;
 
 it('provides a getter/setter for a local state property', function () {
-    $object = new StatefulObject();
+    $object = new StatefulObjectA();
 
-    expect($object->getState())->toBeInstanceOf(From::class);
+    expect($object->getState())->toBeInstanceOf(FromA::class);
 
-    $object->setState(To::make($object));
+    $object->setState(ToA::make($object));
 
-    expect($object->getState())->toBeInstanceOf(To::class);
+    expect($object->getState())->toBeInstanceOf(ToA::class);
 });
