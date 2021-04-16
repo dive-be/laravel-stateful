@@ -81,7 +81,9 @@ class AddressSelect extends CheckoutState
 ### The stateful class
 
 Your stateful classes should implement the `Stateful` contract and use the `InteractsWithState` trait.
-(The latter is optional, but recommended. Adhering to the contract is sufficient.)
+(The latter is optional, but recommended. Adhering to the contract is sufficient.) 
+
+Also, do not forget to define the initial state in the constructor.
 
 ```php
 use Dive\Stateful\Contracts\Stateful;
@@ -90,6 +92,11 @@ use Dive\Stateful\InteractsWithState;
 class CheckoutWizard implements Stateful
 {
     use InteractsWithState;
+    
+    public function __construct() 
+    {
+        $this->state = AddressSelect::make($this);
+    }
     
     // your code
 }
