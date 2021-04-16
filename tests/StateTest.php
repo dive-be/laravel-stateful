@@ -13,7 +13,7 @@ use Tests\Fakes\States\From;
 use Tests\Fakes\States\StatefulObject;
 use Tests\Fakes\States\To;
 
-it("can return the state's name in lower snake case", function () {
+it("can return the state's name in camel case", function () {
     expect(ExampleStateDeliberatelyMadeWithALongName::name())->toBe('exampleStateDeliberatelyMadeWithALongName');
 });
 
