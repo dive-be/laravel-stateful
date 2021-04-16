@@ -27,7 +27,7 @@ abstract class State
 
     public static function name(): string
     {
-        return Str::lower(Str::snake(class_basename(static::class)));
+        return Str::camel(class_basename(static::class));
     }
 
     public function canTransitionTo(string $state): bool

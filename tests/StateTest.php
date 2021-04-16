@@ -14,7 +14,7 @@ use Tests\Fakes\States\StatefulObject;
 use Tests\Fakes\States\To;
 
 it("can return the state's name in lower snake case", function () {
-    expect(ExampleStateDeliberatelyMadeWithALongName::name())->toBe('example_state_deliberately_made_with_a_long_name');
+    expect(ExampleStateDeliberatelyMadeWithALongName::name())->toBe('exampleStateDeliberatelyMadeWithALongName');
 });
 
 it('can determine whether a transition is allowed to take place', function () {
