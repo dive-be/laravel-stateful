@@ -134,12 +134,13 @@ abstract class CheckoutState extends State
     public static function config(): Config
     {
         return parent::config()
-            ->allowTransition(Transition::make(AddressSelect::class, ShippingSelect::class)->guard(ExampleGuard::class));
+            ->allowTransition(Transition::make(AddressSelect::class, ShippingSelect::class)
+                ->guard(ExampleGuard::class));
     }
 }
 ```
 
-Now, every time a transition is attempted, the guard will be consulted first.
+Now, every time a transition is attempted, the guard will be executed first.
 
 ### Side effects / hooks
 
