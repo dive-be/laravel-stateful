@@ -40,7 +40,7 @@ color to give visual feedback to the user.
 
 That's why first, we should create an abstract `CheckoutState` class and define all possible transitions. For example,
 it makes absolutely zero sense to go back to an `AddressSelect` state if the `CheckoutWizard` has reached the `Complete` state.
-However, it is perfectly fine for the user to go back to a previous step as long as the `Complete` state is not reached.
+However, it is perfectly fine for the user to go back to a previous step as long as the `Complete` state is not reached (not shown below, though).
 
 ```php
 abstract class CheckoutState extends State
@@ -53,9 +53,7 @@ abstract class CheckoutState extends State
     {
         return parent::config()
             ->allowTransition(AddressSelect::class, ShippingSelect::class)
-            ->allowTransition(ShippingSelect::class, AddressSelect::class) // go back
             ->allowTransition(ShippingSelect::class, Summary::class)
-            ->allowTransition(Summary::class, ShippingSelect::class) // go back
             ->allowTransition(Summary::class, Complete::class);
     }
 }
@@ -66,15 +64,9 @@ Here is what the `AddressSelect` state could look like:
 ```php
 class AddressSelect extends CheckoutState
 {
-    public function color(): string
-    {
-        return 'maroon';
-    }
+    public function color(): string { return 'maroon'; }
     
-    public function step(): int
-    {
-        return 0;
-    }
+    public function step(): int { return 0; }
 }
 ```
 
@@ -86,9 +78,6 @@ Your stateful classes should implement the `Stateful` contract and use the `Inte
 Also, do not forget to define the initial state in the constructor.
 
 ```php
-use Dive\Stateful\Contracts\Stateful;
-use Dive\Stateful\InteractsWithState;
-
 class CheckoutWizard implements Stateful
 {
     use InteractsWithState;
@@ -114,51 +103,78 @@ $checkout->getState()->transitionTo(Complete::class);
 
 Unless the transition is allowed, a `TransitionFailedException` will be thrown preventing impossible state transitions.
 
-### Guards
+### "Custom" transitions
 
-Sometimes, even when a specific transition is allowed, certain conditions may have to be met in order to transition.
-In this case, guards may be used to achieve this behavior. However, the registration of allowed transitions slightly 
-differs. You must use the `Transition` class directly and guard can be any `callable` (Invokable class, Closure, public class methods).
-When an invokable class is defined as the guard for a transition, it will be instantiated from the IoC container.
+You may define your own `Transition` classes that will have access to the `guard` & `after`/`before` hooks.
+Passing the FQCN to `allowTransition` in the config will suffice.
 
 ```php
-class ExampleGuard
+class AdvanceToShipping extends Transition
 {
-    public function __construct(private MyService $service) {}
+    public function from(): string { return Address::class; }
     
-    public function __invoke(CheckoutWizard $checkout): bool
-    {
-        return $this->service->isValid($checkout);
-    }
+    public function to(): string { return Address::class; }
 }
 ```
 
 ```php
-abstract class CheckoutState extends State
+public static function config(): Config
+{
+    return parent::config()->allowTransition(AdvanceToShipping::class);
+}
+```
+
+Note: when registering a transition without a custom class, a `DefaultTransition` is created for you automatically.
+
+### Guards (validation)
+
+Sometimes, even when a specific transition is allowed, certain conditions may have to be met in order to transition.
+In this case, guards may be used to achieve this behavior. A custom `Transition` is compulsory to use this feature.
+
+- Returning `true` from the guard will allow the transition to take place.
+- Returning `false` will cause a `TransitionFailedException` to be thrown.
+
+```php
+class AdvanceToShipping extends Transition
 {
     // omitted for brevity
     
-    public static function config(): Config
+    public function guard(CheckoutWizard $object, MyService $service)
     {
-        return parent::config()
-            ->allowTransition(Transition::make(AddressSelect::class, ShippingSelect::class)
-                ->guard(ExampleGuard::class));
+        return $service->isValid($object);
     }
 }
 ```
+
+You can access the stateful object by defining a method argument called `$object`. Any other type-hinted dependency will
+be injected by the container using method injection.
 
 Now, every time a transition is attempted, the guard will be executed first.
 
 ### Side effects / hooks
 
-You can use the `after` or `before` setters on the `Transition` class to define callbacks that should be executed
+You can use the `after` or `before` hooks on the `Transition` class to define methods that should be executed
 before or after a certain transition has taken place.
 
 ```php
-Transition::make(AddressSelect::class, ShippingSelect::class)
-    ->guard(ExampleGuard::class)
-    ->after(fn ($to, $checkout) => event(new MyEvent($checkout)));
+class AdvanceToShipping extends Transition
+{
+    // omitted for brevity
+    
+    public function after(CheckoutWizard $object)
+    {
+        // run immediately after the transition
+    }
+    
+    public function before(CheckoutWizard $object)
+    {
+        // run just before the transition
+    }
+}
 ```
+
+Like any guard, hooks can access the stateful object by defining a method argument called `$object`.
+Any other type-hinted dependency will be injected by the container using method injection.
 
 ## Testing
 
