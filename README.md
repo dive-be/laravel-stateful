@@ -36,6 +36,8 @@ Let's say there is a `CheckoutWizard` class that has many possible states: `Addr
 Each of these states should map to the current index of the Wizard in the front-end and each step also has a distinct
 color to give visual feedback to the user.
 
+<p align="center"><img src="https://raw.githubusercontent.com/dive-be/laravel-stateful/master/img/viz.png" width="300"></p>
+
 ### Abstract state
 
 That's why first, we should create an abstract `CheckoutState` class and define all possible transitions. For example,
