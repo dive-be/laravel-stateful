@@ -45,15 +45,15 @@ abstract class State
 
         $transition = $this->config->getTransition($from, $to);
 
-        $transition->whenGuarded($this->object, function () use ($from, $to) {
+        if (! $transition->runGuard($this->object)) {
             throw TransitionFailedException::guarded($from, $to);
-        });
+        }
 
-        $transition->runBeforeHook($this->object, $to);
+        $transition->runBeforeHook($this->object);
 
         $object = $this->object->setState(new $to($this->object));
 
-        $transition->runAfterHook($this->object, $from);
+        $transition->runAfterHook($this->object);
 
         return $object;
     }

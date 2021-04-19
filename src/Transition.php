@@ -2,7 +2,6 @@
 
 namespace Dive\Stateful;
 
-use Closure;
 use Dive\Stateful\Contracts\Stateful;
 use Dive\Stateful\Support\Makeable;
 
@@ -14,30 +13,24 @@ abstract class Transition
 
     abstract public function to(): string;
 
-    public function runAfterHook(Stateful $object, string $state): void
+    public function runAfterHook(Stateful $object)
     {
         if (method_exists($this, 'after')) {
-            $this->after($state, $object);
+            app()->call([$this, 'after'], compact('object'));
         }
     }
 
-    public function runBeforeHook(Stateful $object, string $state): void
+    public function runBeforeHook(Stateful $object)
     {
         if (method_exists($this, 'before')) {
-            $this->before($state, $object);
+            app()->call([$this, 'before'], compact('object'));
         }
     }
 
-    public function whenGuarded(Stateful $object, Closure $callback): void
+    public function runGuard(Stateful $object)
     {
-        if (! method_exists($this, 'guard')) {
-            return;
-        }
-
-        if ($this->guard($object)) {
-            return;
-        }
-
-        $callback();
+        return method_exists($this, 'guard')
+            ? app()->call([$this, 'guard'], compact('object'))
+            : true;
     }
 }
