@@ -131,9 +131,9 @@ Passing the FQCN to `allowTransition` in the config will suffice.
 ```php
 class AdvanceToShipping extends Transition
 {
-    public function from(): string { return Address::class; }
+    public function from(): string { return AddressSelect::class; }
     
-    public function to(): string { return Address::class; }
+    public function to(): string { return ShippingSelect::class; }
 }
 ```
 
