@@ -2,7 +2,7 @@
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/dive-be/laravel-stateful.svg?style=flat-square)](https://packagist.org/packages/dive-be/laravel-stateful)
 
-This package adds state support to non-Eloquent objects in Laravel. 
+This package adds state support to non-Eloquent objects in Laravel.
 
 If you need support for Eloquent models, there are excellent alternatives:
 
@@ -13,10 +13,14 @@ If you need support for Eloquent models, there are excellent alternatives:
 
 ## What problem does this package solve?
 
-Usually, when defining "states" or "statuses" on objects, enumeration-like values/objects are used to represent the 
-current state of the object. While this approach is pragmatic and good enough for simple use cases, it tends to become a
-mess rapidly when complex domain logic has to be incorporated. This package solves this problem by using the state pattern
-and the concept of state machines.
+Usually, when defining "states" or "statuses" on objects, enumeration-like values/objects are used to represent the
+current state of the object.
+
+While this approach is pragmatic and good enough for simple use cases, it tends to become a
+mess rapidly when complex domain logic has to be incorporated.
+
+This package solves this problem by using the **state pattern**
+and the concept of **state machines**.
 
 ## Installation
 
@@ -33,24 +37,32 @@ The best example is a practical example.
 ### Context
 
 Let's say there is a `CheckoutWizard` class that has many possible states: `AddressSelect`, `ShippingSelect`, `Summary`, `Complete`.
-Each of these states should map to the current index of the Wizard in the front-end and each step also has a distinct
-color to give visual feedback to the user.
+Each of these states should map to the current index of the Wizard in the front-end, and each step has an associated view that will be resolved by Blade.
 
 <p align="center"><img src="https://raw.githubusercontent.com/dive-be/laravel-stateful/master/img/viz.png" width="300"></p>
 
 ### Abstract state
 
-That's why first, we should create an abstract `CheckoutState` class and define all possible transitions. For example,
-it makes absolutely zero sense to go back to an `AddressSelect` state if the `CheckoutWizard` has reached the `Complete` state.
-However, it is perfectly fine for the user to go back to a previous step as long as the `Complete` state is not reached (not shown below, though).
+That's why first, we should create an abstract `CheckoutState` class and define all possible transitions, as well as the requirements for each state (which view would we like to show, and what is the index of this state?).
+
+It's important to think carefully about the possible transitions: it makes absolutely zero sense to go back to an `AddressSelect` state if the `CheckoutWizard` has reached the `Complete` state. However, it is perfectly fine for the user to go back to a previous step as long as the `Complete` state is not reached (not shown below, though).
+
+Here's what an abstract version of `CheckoutState` might look like:
 
 ```php
 abstract class CheckoutState extends State
 {
-    abstract public function color(): string;
+    /* You can define which methods need to be implemented for each particular state.
+     * For example, you might want each state to have an associated view to resolve. */
+    abstract public function view(): string;
 
+    /* Like `view()`, each state should also have an associated index. 
+     * We'll enforce that this method needs to be implemented by each class 
+     * that inherits from this one. */
     abstract public function step(): int;
     
+    /* Set up which state transitions are allowed. 
+     * This is required for the states to function as expected. */
     public static function config(): Config
     {
         return parent::config()
@@ -61,21 +73,27 @@ abstract class CheckoutState extends State
 }
 ```
 
-Here is what the `AddressSelect` state could look like:
+Here's what the `AddressSelect` state might look like, which is extending the abstract `CheckoutState`:
 
 ```php
 class AddressSelect extends CheckoutState
 {
-    public function color(): string { return 'maroon'; }
+    public function view(): string
+    { 
+        return 'checkout.address_select'; 
+    }
     
-    public function step(): int { return 0; }
+    public function step(): int
+    {
+        return 0; 
+    }
 }
 ```
 
 ### The stateful class
 
-Your stateful classes should implement the `Stateful` contract and use the `InteractsWithState` trait.
-(The latter is optional, but recommended. Adhering to the contract is sufficient.) 
+Your stateful classes (classes that will make use of states and possible transitions) should implement the `Stateful` contract and use the `InteractsWithState` trait.
+(The latter is optional, but recommended. Adhering to the contract is sufficient.)
 
 Also, do not forget to define the initial state in the constructor.
 
@@ -89,13 +107,13 @@ class CheckoutWizard implements Stateful
         $this->state = AddressSelect::make($this);
     }
     
-    // your code
+    // Your code here
 }
-````
+```
 
 ### Transitioning
 
-Now, to transition to another state:
+Let's continue from our `CheckoutWizard` example. To transition to another state, you can do the following:
 
 ```php
 $checkout = new CheckoutWizard();
