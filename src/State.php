@@ -23,6 +23,14 @@ abstract class State
         return Config::make();
     }
 
+    public static function from(string $name): string
+    {
+        return Str::of(static::class)
+            ->beforeLast('\\')
+            ->append('\\', Str::studly($name))
+            ->__toString();
+    }
+
     public static function name(): string
     {
         return Str::camel(class_basename(static::class));
