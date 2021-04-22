@@ -4,6 +4,8 @@ namespace Dive\Stateful;
 
 use Dive\Stateful\Contracts\Stateful;
 use Dive\Stateful\Support\Makeable;
+use ReflectionMethod;
+use ReflectionUnionType;
 
 abstract class Transition
 {
@@ -13,24 +15,48 @@ abstract class Transition
 
     abstract public function to(): string;
 
-    public function runAfterHook(Stateful $object)
+    public function runAfterHook(Stateful $object): void
     {
-        if (method_exists($this, 'after')) {
-            app()->call([$this, 'after'], compact('object'));
+        if (method_exists($this, $method = 'after')) {
+            $this->runMethod($method, $object);
         }
     }
 
-    public function runBeforeHook(Stateful $object)
+    public function runBeforeHook(Stateful $object): void
     {
-        if (method_exists($this, 'before')) {
-            app()->call([$this, 'before'], compact('object'));
+        if (method_exists($this, $method = 'before')) {
+            $this->runMethod($method, $object);
         }
     }
 
-    public function runGuard(Stateful $object)
+    public function runGuard(Stateful $object): bool
     {
-        return method_exists($this, 'guard')
-            ? app()->call([$this, 'guard'], compact('object'))
-            : true;
+        return method_exists($this, $method = 'guard')
+            ? $this->runMethod($method, $object) : true;
+    }
+
+    private function runMethod(string $name, Stateful $object): mixed
+    {
+        $parameters = (new ReflectionMethod($this, $name))->getParameters();
+
+        foreach ($parameters as $idx => $parameter) {
+            $type = $parameter->getType();
+
+            if ($type instanceof ReflectionUnionType) {
+                $type = null;
+            } else {
+                $type = $type->getName();
+            }
+
+            if (is_null($type)) {
+                $parameters[$idx] = $type;
+            } elseif ($type === Stateful::class || is_subclass_of($type, Stateful::class)) {
+                $parameters[$idx] = $object;
+            } else {
+                $parameters[$idx] = app($type);
+            }
+        }
+
+        return call_user_func_array([$this, $name], $parameters);
     }
 }
