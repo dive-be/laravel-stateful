@@ -159,15 +159,15 @@ class AdvanceToShipping extends Transition
 {
     // omitted for brevity
     
-    public function guard(CheckoutWizard $object, MyService $service)
+    public function guard(CheckoutWizard $wizard, MyService $service)
     {
-        return $service->isValid($object);
+        return $service->isValid($wizard);
     }
 }
 ```
 
-You can access the stateful object by defining a method argument called `$object`. Any other type-hinted dependency will
-be injected by the container using method injection.
+You can access the stateful object by defining a type-hinted method argument with either the `Stateful` contract or your own sub class. 
+Any other type-hinted dependency will be injected via the container using method injection.
 
 Now, every time a transition is attempted, the guard will be executed first.
 
@@ -181,20 +181,19 @@ class AdvanceToShipping extends Transition
 {
     // omitted for brevity
     
-    public function after(CheckoutWizard $object)
+    public function after(CheckoutWizard $wizard)
     {
         // run immediately after the transition
     }
     
-    public function before(CheckoutWizard $object)
+    public function before(CheckoutWizard $wizard)
     {
         // run just before the transition
     }
 }
 ```
 
-Like any guard, hooks can access the stateful object by defining a method argument called `$object`.
-Any other type-hinted dependency will be injected by the container using method injection.
+Like any guard, hooks can access the stateful object by properly type-hinting a method argument.
 
 ## Testing
 
