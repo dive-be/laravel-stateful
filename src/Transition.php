@@ -40,6 +40,10 @@ abstract class Transition
         $parameters = (new ReflectionMethod($this, $name))->getParameters();
 
         foreach ($parameters as $idx => $parameter) {
+            if ($parameter->isVariadic()) {
+                continue;
+            }
+
             $type = $parameter->getType();
 
             if ($type instanceof ReflectionUnionType) {
