@@ -39,6 +39,6 @@ final class Config
 
     public function isTransitionAllowed(string $from, string $to): bool
     {
-        return array_key_exists($this->key->generate($from, $to), $this->transitions);
+        return $from === $to || array_key_exists($this->key->generate($from, $to), $this->transitions);
     }
 }
