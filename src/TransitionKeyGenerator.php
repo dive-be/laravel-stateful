@@ -8,7 +8,7 @@ final class TransitionKeyGenerator
 {
     use Makeable;
 
-    public const SEPARATOR = '=>';
+    private const SEPARATOR = '=>';
 
     public function generate(string $from, string $to): string
     {
