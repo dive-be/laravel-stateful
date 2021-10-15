@@ -1,8 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace Dive\Stateful;
+namespace Dive\Concerns\Stateful;
 
 use Dive\Stateful\Contracts\Stateful;
+use Dive\Stateful\State;
 
 trait InteractsWithState
 {
