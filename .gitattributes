@@ -11,4 +11,4 @@
 /phpstan.neon.dist       export-ignore
 /testbench.yaml          export-ignore
 /CONTRIBUTING.md         export-ignore
-/img                export-ignore
+/img                     export-ignore
