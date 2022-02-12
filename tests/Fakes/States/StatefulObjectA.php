@@ -2,8 +2,8 @@
 
 namespace Tests\Fakes\States;
 
+use Dive\Stateful\Concerns\InteractsWithState;
 use Dive\Stateful\Contracts\Stateful;
-use Dive\Stateful\InteractsWithState;
 
 class StatefulObjectA implements Stateful
 {

@@ -2,8 +2,8 @@
 
 namespace Tests\Fakes\CustomTransitions;
 
+use Dive\Stateful\Concerns\InteractsWithState;
 use Dive\Stateful\Contracts\Stateful;
-use Dive\Stateful\InteractsWithState;
 
 class StatefulObjectB implements Stateful
 {
