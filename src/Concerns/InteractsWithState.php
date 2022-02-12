@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Dive\Concerns\Stateful;
+namespace Dive\Stateful\Concerns;
 
 use Dive\Stateful\Contracts\Stateful;
 use Dive\Stateful\State;
@@ -27,7 +27,7 @@ trait InteractsWithState
     }
 
     /**
-     * @throws Exceptions\TransitionFailedException
+     * @throws \Dive\Stateful\Exceptions\TransitionFailedException
      */
     public function transitionTo(string $to): self
     {
