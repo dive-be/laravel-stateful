@@ -32,7 +32,8 @@ abstract class Transition
     public function runGuard(Stateful $object): bool
     {
         return method_exists($this, $method = 'guard')
-            ? $this->runMethod($method, $object) : true;
+            ? $this->runMethod($method, $object)
+            : true;
     }
 
     private function runMethod(string $name, Stateful $object): mixed

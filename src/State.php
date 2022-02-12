@@ -13,8 +13,9 @@ abstract class State
 
     protected Config $config;
 
-    final public function __construct(protected Stateful $object)
-    {
+    final public function __construct(
+        protected Stateful $object,
+    ) {
         $this->config = static::config();
     }
 
@@ -28,7 +29,7 @@ abstract class State
         return Str::of(static::class)
             ->beforeLast('\\')
             ->append('\\', Str::studly($name))
-            ->__toString();
+            ->value();
     }
 
     public static function name(): string
